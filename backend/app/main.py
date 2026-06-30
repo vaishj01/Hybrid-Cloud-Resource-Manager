@@ -1,13 +1,14 @@
 from fastapi import FastAPI
 
 from app.config.settings import settings
-
-# Import engine
 from app.database.database import engine
-
-# Import Base
 from app.models.base import Base
+
+# Import the model so SQLAlchemy knows about it
 from app.models.user import User
+
+# Import the router
+from app.routes.user_routes import router as user_router
 
 app = FastAPI(
     title=settings.APP_NAME,
@@ -17,7 +18,6 @@ app = FastAPI(
 
 @app.on_event("startup")
 def startup():
-
     Base.metadata.create_all(bind=engine)
 
 
@@ -28,3 +28,6 @@ def root():
         "Version": settings.APP_VERSION,
         "Status": "Running Successfully"
     }
+
+
+app.include_router(user_router)
