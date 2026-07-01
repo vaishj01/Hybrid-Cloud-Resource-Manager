@@ -10,6 +10,7 @@ from app.models.resource import Resource
 # Import the router
 from app.routes.user_routes import router as user_router
 from app.routes.resource_routes import router as resource_router
+from app.routes.dashboard_routes import router as dashboard_router
 app = FastAPI(
     title=settings.APP_NAME,
     version=settings.APP_VERSION
@@ -32,3 +33,4 @@ def root():
 
 app.include_router(user_router)
 app.include_router(resource_router)
+app.include_router(dashboard_router)

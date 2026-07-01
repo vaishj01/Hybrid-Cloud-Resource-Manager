@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
 
 from app.database.session import get_db
@@ -43,11 +43,31 @@ def create_new_resource(
 
 @router.get("/", response_model=list[ResourceResponse])
 def get_resources(
+    provider: str | None = Query(default=None),
+    status: str | None = Query(default=None),
+    region: str | None = Query(default=None),
+    search: str | None = Query(default=None),
+    sort_by: str | None = Query(
+        default=None,
+        pattern="^(resource_name|provider|status|region)$"
+    ),
+    order: str = Query(
+        default="asc",
+        pattern="^(asc|desc)$"
+    ),
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user)
 ):
 
-    return get_all_resources(db)
+    return get_all_resources(
+        db,
+        provider,
+        status,
+        region,
+        search,
+        sort_by,
+        order
+    )
 
 
 @router.get("/{resource_id}", response_model=ResourceResponse)

@@ -31,9 +31,53 @@ def create_resource(
     return new_resource
 
 
-def get_all_resources(db: Session):
+def get_all_resources(
+    db: Session,
+    provider: str = None,
+    status: str = None,
+    region: str = None,
+    search: str = None,
+    sort_by: str = None,
+    order: str = "asc"
+):
 
-    return db.query(Resource).all()
+    query = db.query(Resource)
+
+    # Filter by Provider
+    if provider:
+        query = query.filter(
+            Resource.provider == provider
+        )
+
+    # Filter by Status
+    if status:
+        query = query.filter(
+            Resource.status == status
+        )
+
+    # Filter by Region
+    if region:
+        query = query.filter(
+            Resource.region == region
+        )
+
+    # Search by Resource Name
+    if search:
+        query = query.filter(
+            Resource.resource_name.ilike(f"%{search}%")
+        )
+
+    # Sorting
+    if sort_by:
+
+        column = getattr(Resource, sort_by)
+
+        if order.lower() == "desc":
+            query = query.order_by(column.desc())
+        else:
+            query = query.order_by(column.asc())
+
+    return query.all()
 
 
 def get_resource_by_id(
