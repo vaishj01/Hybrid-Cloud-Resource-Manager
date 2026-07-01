@@ -6,10 +6,10 @@ from app.models.base import Base
 
 # Import the model so SQLAlchemy knows about it
 from app.models.user import User
-
+from app.models.resource import Resource
 # Import the router
 from app.routes.user_routes import router as user_router
-
+from app.routes.resource_routes import router as resource_router
 app = FastAPI(
     title=settings.APP_NAME,
     version=settings.APP_VERSION
@@ -31,3 +31,4 @@ def root():
 
 
 app.include_router(user_router)
+app.include_router(resource_router)
