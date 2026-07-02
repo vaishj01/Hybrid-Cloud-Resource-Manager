@@ -9,7 +9,8 @@ from app.models.user import User
 from app.schemas.resource_schema import (
     ResourceCreate,
     ResourceUpdate,
-    ResourceResponse
+    ResourceResponse,
+    PaginatedResourceResponse
 )
 
 from app.services.resource_service import (
@@ -41,7 +42,8 @@ def create_new_resource(
     )
 
 
-@router.get("/", response_model=list[ResourceResponse])
+@router.get("/", response_model=PaginatedResourceResponse)
+@router.get("/", response_model=PaginatedResourceResponse)
 def get_resources(
     provider: str | None = Query(default=None),
     status: str | None = Query(default=None),
@@ -55,6 +57,15 @@ def get_resources(
         default="asc",
         pattern="^(asc|desc)$"
     ),
+    page: int = Query(
+        default=1,
+        ge=1
+    ),
+    size: int = Query(
+        default=10,
+        ge=1,
+        le=100
+    ),
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user)
 ):
@@ -66,7 +77,9 @@ def get_resources(
         region,
         search,
         sort_by,
-        order
+        order,
+        page,
+        size
     )
 
 

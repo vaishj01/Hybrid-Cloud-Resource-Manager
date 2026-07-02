@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 
 
 class ResourceBase(BaseModel):
@@ -30,3 +30,19 @@ class ResourceResponse(ResourceBase):
 
     class Config:
         from_attributes = True
+
+class PaginatedResourceResponse(BaseModel):
+
+    page: int
+
+    size: int
+
+    total_records: int
+
+    total_pages: int
+
+    items: list[ResourceResponse]
+
+    model_config = ConfigDict(
+        from_attributes=True
+    )

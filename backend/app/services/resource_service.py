@@ -1,3 +1,4 @@
+import math
 from sqlalchemy.orm import Session
 
 from app.models.resource import Resource
@@ -5,7 +6,9 @@ from app.models.user import User
 
 from app.schemas.resource_schema import (
     ResourceCreate,
-    ResourceUpdate
+    ResourceUpdate,
+    ResourceResponse,
+    PaginatedResourceResponse
 )
 
 
@@ -31,6 +34,9 @@ def create_resource(
     return new_resource
 
 
+import math
+
+
 def get_all_resources(
     db: Session,
     provider: str = None,
@@ -38,7 +44,9 @@ def get_all_resources(
     region: str = None,
     search: str = None,
     sort_by: str = None,
-    order: str = "asc"
+    order: str = "asc",
+    page: int = 1,
+    size: int = 10
 ):
 
     query = db.query(Resource)
@@ -77,7 +85,25 @@ def get_all_resources(
         else:
             query = query.order_by(column.asc())
 
-    return query.all()
+    total_records = query.count()
+
+    total_pages = math.ceil(total_records / size) if total_records else 1
+
+    resources = (
+        query
+        .offset((page - 1) * size)
+        .limit(size)
+        .all()
+    )
+
+    return {
+        "page": page,
+        "size": size,
+        "total_records": total_records,
+        "total_pages": total_pages,
+        "items": resources
+    }
+
 
 
 def get_resource_by_id(
